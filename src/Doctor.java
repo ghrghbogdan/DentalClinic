@@ -4,14 +4,12 @@ public class Doctor extends Person {
     private Clinic clinic;
     private String specialization;
     private int yearsOfExperience;
-    private List<Appointment> appointmentList;
 
     public Doctor(String name, String personalId, String email, String phone,Clinic clinic, String specialization, int yearsOfExperience) {
         super(name, personalId, email, phone);
         this.clinic=clinic;
         this.specialization = specialization;
         this.yearsOfExperience = yearsOfExperience;
-
 
     }
     public void setClinic(Clinic clinic){
@@ -36,12 +34,7 @@ public class Doctor extends Person {
     public void setYearsOfExperience(int yearsOfExperience) {
         this.yearsOfExperience = yearsOfExperience;
     }
-    public void setAppointmentList(){
-        this.appointmentList=clinic.getDoctorAppointment(this);
-    }
-    public List<Appointment> getAppointmentList(){
-        return this.appointmentList;
-    }
+
 
 
     @Override

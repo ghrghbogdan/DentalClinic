@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Appointment {
+    private static int idCounter = 1;
+    private int id;
     private Patient patient;
     private Doctor doctor;
     private Clinic clinic;
@@ -10,6 +12,7 @@ public class Appointment {
     private LocalDateTime dateTime;
 
     public Appointment(Patient patient, Doctor doctor, Clinic clinic, Service service, LocalDateTime dateTime) {
+        this.id=idCounter++;
         this.patient = patient;
         this.doctor = doctor;
         this.clinic = clinic;
@@ -31,6 +34,9 @@ public class Appointment {
 
     public Service getService() {
         return service;
+    }
+    public int getId(){
+        return id;
     }
 
     public LocalDateTime getDateTime() {

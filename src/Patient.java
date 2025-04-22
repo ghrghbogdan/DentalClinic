@@ -24,7 +24,7 @@ public class Patient extends Person {
         return medicalHistory;
     }
 
-    public void addLog(Log logEntry) {
+    public void addMedicalHistory(Log logEntry) {
         medicalHistory.add(logEntry);
     }
 

@@ -12,3 +12,26 @@ nu se parcurg colecțiile pana la data checkpoint-ului.
 • utilizare moștenire pentru crearea de clase adiționale și utilizarea lor în cadrul colecțiilor;
 • cel puțin o clasă serviciu care să expună operațiile sistemului
 • o clasa Main din care sunt făcute apeluri către servicii
+
+Clase:
+
+Appointment
+Bill
+Clinic
+ClinicNetwork
+ClinicService
+Doctor
+Log
+Patient
+Person
+Service
+
+Operatii:
+
+Afisare programari in functie de doctor/clinica/pacient
+Afisare doctori/clinici/pacienti
+Afisare istoric pacient
+Adaugare pacient/doctor
+Crearea unei programari
+Creare factura
+

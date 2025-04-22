@@ -7,7 +7,6 @@ public class Clinic {
     private List<Doctor> doctors;
     private List<Service> services;
     private List<Patient> patients;
-    private List<Appointment> appointments;
 
     public Clinic(String name, String address) {
         this.name = name;
@@ -15,7 +14,6 @@ public class Clinic {
         this.doctors = new ArrayList<>();
         this.services = new ArrayList<>();
         this.patients = new ArrayList<>();
-        this.appointments= new ArrayList<>();
     }
 
     // Getters and Setters
@@ -52,22 +50,8 @@ public class Clinic {
             patients.add(patient);
         }
     }
-    public List<Appointment> getAppointments(){
-        return appointments;
-    }
-    public void addAppointment(Appointment appointment)
-    {
-        appointments.add(appointment);
-    }
-    public List<Appointment> getDoctorAppointment(Doctor doctor){
-        ArrayList<Appointment> appointments = null;
-        for(int i=0;i<this.appointments.size();i++)
-        {
-            if(this.appointments.get(i).getDoctor() == doctor)
-                appointments.add(this.appointments.get(i));
-        }
-        return appointments;
-    }
+
+
 
 
     @Override
