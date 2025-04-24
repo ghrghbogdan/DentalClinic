@@ -19,7 +19,7 @@ public class Main {
                 case 3 -> showPatientHistory();
                 case 4 -> addEntity();
                 case 5 -> createAppointment();
-                case 6 -> createBill();
+                case 6 -> showBillForPatient();
                 case 7 -> {
                     System.out.println("Exiting system.");
                     return;
@@ -38,7 +38,7 @@ public class Main {
                 3. Show patient medical history
                 4. Add new Patient / Doctor
                 5. Create a new Appointment
-                6. Create a Bill
+                6. Show bills for a patient
                 7. Exit
                 ========================================
                 Choose an option (1-7):
@@ -173,10 +173,11 @@ public class Main {
         clinicService.scheduleAppointmentByNames(patientName, doctorName, clinicName, serviceName, dateTime);
     }
 
-    private static void createBill() {
+    private static void showBillForPatient() {
         scanner.nextLine();
-        System.out.print("Enter appointment ID (index): ");
-        int index = scanner.nextInt();
-        clinicService.createBillForAppointment(index);
+        System.out.print("Enter patient name: ");
+        String billPatientName = scanner.nextLine();
+        clinicService.printBillsForPatient(billPatientName);
+
     }
 }
