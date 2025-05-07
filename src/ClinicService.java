@@ -1,14 +1,15 @@
 import java.time.LocalDateTime;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class ClinicService {
     private ClinicNetwork network;
     private List<Appointment> appointments;
-    private Map<String, List<Bill>> billsByPatient; // noua structură
+    private Map<String, List<Bill>> billsByPatient;
+    private static Scanner scanner = new Scanner(System.in);
 
     public ClinicService(ClinicNetwork network) {
         this.network = network;
@@ -24,23 +25,38 @@ public class ClinicService {
         return network.findClinicByName(name);
     }
 
-    public void scheduleAppointment(Patient patient, Doctor doctor, Clinic clinic, Service service, LocalDateTime dateTime) {
-        Appointment appointment = new Appointment(patient, doctor, clinic, service, dateTime);
-        appointments.add(appointment);
-        clinic.addPatient(patient);
+    public void addServiceToClinic(String clinicName) {
+        Clinic clinic = findClinicByName(clinicName);
+        if (clinic == null) {
+            System.out.println("Clinic not found.");
+            return;
+        }
 
-        // Generate and store bill
-        createBillForAppointment(appointment);
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter service name: ");
+        String name = scanner.nextLine();
 
-        // Add to medical history
-        Log log = new Log(clinic.getName(), service.getName(), doctor, dateTime.toLocalDate());
-        patient.addMedicalHistory(log);
+        System.out.print("Enter service price: ");
+        double price = Double.parseDouble(scanner.nextLine());
 
-        System.out.println("Appointment scheduled:\n" + appointment);
+        System.out.print("Enter duration in minutes: ");
+        int duration = Integer.parseInt(scanner.nextLine());
+
+        Service newService = new Service(name, price, duration);
+
+        List<Service> services = clinic.getServices();
+        int i = 0;
+        while (i < services.size() && services.get(i).getName().compareToIgnoreCase(name) < 0) {    //Insertion sort by name
+            i++;
+        }
+        services.add(i, newService);
+
+        System.out.println("Service added and sorted by name.");
     }
 
     public void scheduleAppointmentByNames(String patientName, String doctorName, String clinicName, String serviceName, LocalDateTime dateTime) {
         Clinic clinic = null;
+        //Find clinic by name
         for (Clinic c : network.getClinics()) {
             if (c.getName().equalsIgnoreCase(clinicName)) {
                 clinic = c;
@@ -51,7 +67,7 @@ public class ClinicService {
             System.out.println("Clinic not found.");
             return;
         }
-
+        //Find Doctor by name
         Doctor doctor = null;
         for (Doctor d : clinic.getDoctors()) {
             if (d.getName().equalsIgnoreCase(doctorName)) {
@@ -63,7 +79,7 @@ public class ClinicService {
             System.out.println("Doctor not found in this clinic.");
             return;
         }
-
+        //Find patient by name
         Patient patient = null;
         for (Patient p : clinic.getPatients()) {
             if (p.getName().equalsIgnoreCase(patientName)) {
@@ -71,11 +87,25 @@ public class ClinicService {
                 break;
             }
         }
+        //If no patient found with this name we crate a new patient
         if (patient == null) {
-            System.out.println("Patient not found in this clinic.");
-            return;
-        }
+            System.out.println("Patient not found in this clinic.\n Please provide the information needed for registering a new patient:\n");
+            System.out.print("Name: ");
+            String name = scanner.nextLine();
+            System.out.print("Personal ID: ");
+            String personalId = scanner.nextLine();
+            System.out.print("Email: ");
+            String email = scanner.nextLine();
+            System.out.print("Phone: ");
+            String phone = scanner.nextLine();
+            System.out.print("Insurance Provider: ");
+            String insurance = scanner.nextLine();
+            Patient patientNameForRegister = new Patient(name, personalId, email, phone, insurance);
+            addPatientToClinic(patientNameForRegister,clinic.getName());
+            patient = patientNameForRegister;
 
+        }
+        //Find service by name
         Service service = null;
         for (Service s : clinic.getServices()) {
             if (s.getName().equalsIgnoreCase(serviceName)) {
@@ -87,13 +117,15 @@ public class ClinicService {
             System.out.println("Service not available in this clinic.");
             return;
         }
-
+        //Create appointment
         Appointment appointment = new Appointment(patient, doctor, clinic, service, dateTime);
         appointments.add(appointment);
 
+        //Create a new log in patient medical history
         Log log = new Log(clinic.getName(), service.getName(), doctor, dateTime.toLocalDate());
         patient.getMedicalHistory().add(log);
 
+        //Create the bill
         createBillForAppointment(appointment);
 
         System.out.println("Appointment successfully scheduled!");
@@ -101,7 +133,7 @@ public class ClinicService {
 
     public void createBillForAppointment(Appointment appointment) {
         Bill bill = new Bill(appointment);
-
+        //Get patient name for composing his bill
         String patientName = appointment.getPatient().getName();
         billsByPatient.computeIfAbsent(patientName, k -> new ArrayList<>()).add(bill);
 
@@ -132,13 +164,6 @@ public class ClinicService {
         }
     }
 
-    // === Other unchanged methods ===
-    public void showAllAppointments() {
-        for (Appointment a : appointments) {
-            System.out.println(a);
-            System.out.println("--------");
-        }
-    }
 
     public void showAppointmentsByDoctor(String name) {
         for (Appointment a : appointments) {

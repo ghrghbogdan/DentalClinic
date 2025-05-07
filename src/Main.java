@@ -1,4 +1,3 @@
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -18,9 +17,10 @@ public class Main {
                 case 2 -> showAllEntities();
                 case 3 -> showPatientHistory();
                 case 4 -> addEntity();
-                case 5 -> createAppointment();
-                case 6 -> showBillForPatient();
-                case 7 -> {
+                case 5 -> addService();
+                case 6 -> createAppointment();
+                case 7 -> showBillForPatient();
+                case 8 -> {
                     System.out.println("Exiting system.");
                     return;
                 }
@@ -30,6 +30,7 @@ public class Main {
     }
 
     private static void printMenu() {
+        //CLI
         System.out.println("""
                 
                 ======= DentalCare Network Menu =======
@@ -37,14 +38,15 @@ public class Main {
                 2. Show all Doctors / Clinics / Patients
                 3. Show patient medical history
                 4. Add new Patient / Doctor
-                5. Create a new Appointment
-                6. Show bills for a patient
-                7. Exit
+                5. Add new Service
+                6. Create a new Appointment
+                7. Show bills for a patient
+                8. Exit
                 ========================================
-                Choose an option (1-7):
+                Choose an option (1-8):
                 """);
     }
-
+    // Function for getting CLI input
     private static int getChoice() {
         while (!scanner.hasNextInt()) {
             System.out.println("Please enter a valid number.");
@@ -81,7 +83,7 @@ public class Main {
         System.out.println("Filter appointments by:");
         System.out.println("1. Doctor name\n2. Clinic name\n3. Patient name");
         int option = getChoice();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
 
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
@@ -108,7 +110,7 @@ public class Main {
     }
 
     private static void showPatientHistory() {
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
         System.out.print("Enter patient's name: ");
         String name = scanner.nextLine();
         clinicService.showMedicalHistory(name);
@@ -118,7 +120,7 @@ public class Main {
         System.out.println("What do you want to add?");
         System.out.println("1. Patient\n2. Doctor");
         int option = getChoice();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
 
         System.out.print("Name: ");
         String name = scanner.nextLine();
@@ -155,9 +157,16 @@ public class Main {
             System.out.println("Invalid option.");
         }
     }
+    private static void addService(){
+        scanner.nextLine();
+        System.out.print("Clinic name : ");
+        String clinicName = scanner.nextLine();
+        clinicService.addServiceToClinic(clinicName);
+    }
+
 
     private static void createAppointment() {
-        scanner.nextLine(); // flush
+        scanner.nextLine();
         System.out.print("Patient name: ");
         String patientName = scanner.nextLine();
         System.out.print("Doctor name: ");
