@@ -5,7 +5,7 @@ public class Patient extends Person {
     private String insuranceProvider;
     private List<Log> medicalHistory;
 
-    public Patient(String name, String personalId, String email, String phone, String insuranceProvider) {
+    public Patient(String name, String personalId, String email, String phone, String insuranceProvider)  {
         super(name, personalId, email, phone);
         this.insuranceProvider = insuranceProvider;
         this.medicalHistory = new ArrayList<>();

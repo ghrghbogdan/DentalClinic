@@ -1,17 +1,16 @@
 import java.time.LocalDateTime;
 import java.util.*;
-
+import java.time.LocalDate;
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
     private static ClinicService clinicService = new ClinicService(new ClinicNetwork("DentalCare Network"));
 
     public static void main(String[] args) {
-        initializeSystem();
-
+        DatabaseConnection.getConnection();
         while (true) {
             printMenu();
             int choice = getChoice();
-
+            try{
             switch (choice) {
                 case 1 -> showAppointmentsByCriteria();
                 case 2 -> showAllEntities();
@@ -20,11 +19,20 @@ public class Main {
                 case 5 -> addService();
                 case 6 -> createAppointment();
                 case 7 -> showBillForPatient();
-                case 8 -> {
+                case 8 -> showClinicReport();
+                case 9 -> {
+                    updatedeleteService();
+                }
+                case 0 -> {
                     System.out.println("Exiting system.");
+                    DatabaseConnection.closeConnection();
                     return;
                 }
                 default -> System.out.println("Invalid choice.");
+            }}
+            catch (Exception e) {
+                System.out.println("An error occurred: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -41,9 +49,11 @@ public class Main {
                 5. Add new Service
                 6. Create a new Appointment
                 7. Show bills for a patient
-                8. Exit
+                8. Show clinic report
+                9. Update / Delete Service
+                0. Exit
                 ========================================
-                Choose an option (1-8):
+                Choose an option (0-9):
                 """);
     }
     // Function for getting CLI input
@@ -55,29 +65,6 @@ public class Main {
         return scanner.nextInt();
     }
 
-    private static void initializeSystem() {
-        // Create clinics, services, doctors, patients for demo purposes
-        Clinic clinic1 = new Clinic("Smile Clinic", "Strada Zambetului 5");
-        Clinic clinic2 = new Clinic("Healthy Teeth", "Bulevardul Sanatatii 12");
-        clinicService.addClinic(clinic1);
-        clinicService.addClinic(clinic2);
-
-        Service cleaning = new Service("Cleaning", 50.0, 30);
-        Service checkup = new Service("Checkup", 60.0, 25);
-        clinic1.addService(cleaning);
-        clinic1.addService(checkup);
-        clinic2.addService(cleaning);
-
-        Doctor doc1 = new Doctor("Dr. John", "123", "john@mail.com", "0700000001", clinic1, "Dentist", 5);
-        Doctor doc2 = new Doctor("Dr. Alice", "456", "alice@mail.com", "0700000002", clinic2, "Orthodontist", 7);
-        clinic1.addDoctor(doc1);
-        clinic2.addDoctor(doc2);
-
-        Patient pat1 = new Patient("Ana", "111", "ana@mail.com", "0700000003", "CAS");
-        Patient pat2 = new Patient("Mihai", "222", "mihai@mail.com", "0700000004", "CAS");
-        clinic1.addPatient(pat1);
-        clinic2.addPatient(pat2);
-    }
 
     private static void showAppointmentsByCriteria() {
         System.out.println("Filter appointments by:");
@@ -152,7 +139,7 @@ public class Main {
             System.out.print("Years of experience: ");
             int exp = scanner.nextInt();
             Doctor doctor = new Doctor(name, personalId, email, phone, clinic, spec, exp);
-            clinic.addDoctor(doctor);
+            clinicService.addDoctorToClinic(doctor,clinicName);
         } else {
             System.out.println("Invalid option.");
         }
@@ -169,15 +156,20 @@ public class Main {
         scanner.nextLine();
         System.out.print("Patient name: ");
         String patientName = scanner.nextLine();
-        System.out.print("Doctor name: ");
-        String doctorName = scanner.nextLine();
         System.out.print("Clinic name: ");
         String clinicName = scanner.nextLine();
+        boolean valid=clinicService.showAllDoctorsByClinic(clinicName);
+        if(!valid){
+            System.out.println("Clinic unknown");
+            return ;
+        }
+        System.out.print("Doctor name: ");
+        String doctorName = scanner.nextLine();
+        clinicService.showServices(clinicName);
         System.out.print("Service name: ");
         String serviceName = scanner.nextLine();
         System.out.print("Date and time (yyyy-MM-ddTHH:mm): ");
         String dateTimeString = scanner.nextLine();
-
         LocalDateTime dateTime = LocalDateTime.parse(dateTimeString);
         clinicService.scheduleAppointmentByNames(patientName, doctorName, clinicName, serviceName, dateTime);
     }
@@ -186,7 +178,41 @@ public class Main {
         scanner.nextLine();
         System.out.print("Enter patient name: ");
         String billPatientName = scanner.nextLine();
+        System.out.println("Print bills");
         clinicService.printBillsForPatient(billPatientName);
 
+    }
+
+    private static void showClinicReport() {
+        scanner.nextLine();
+        System.out.print("Clinic name: ");
+        String clinicName = scanner.nextLine();
+        System.out.println("Start date (yyyy-MM-dd): ");
+        String startDateString = scanner.nextLine();
+        LocalDate startDate = LocalDate.parse(startDateString);
+        System.out.println("End date (yyyy-MM-dd): ");
+        String endDateString = scanner.nextLine();
+        LocalDate endDate = LocalDate.parse(endDateString);
+        clinicService.generateClinicReport(clinicName,startDate,endDate);
+    }
+    private static void updatedeleteService() {
+        scanner.nextLine();
+        System.out.print("Clinic name: ");
+        String clinicName = scanner.nextLine();
+        System.out.print("Service name: ");
+        String serviceName = scanner.nextLine();
+        System.out.println("1. Update service\n2. Delete service");
+        int option = getChoice();
+        if (option == 1) {
+            System.out.print("New Price: ");
+            double newPrice = scanner.nextDouble();
+
+
+            clinicService.updateService(clinicName, serviceName, newPrice);
+        } else if (option == 2) {
+            clinicService.deleteService(clinicName, serviceName);
+        } else {
+            System.out.println("Invalid option.");
+        }
     }
 }

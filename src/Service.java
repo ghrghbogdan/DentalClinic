@@ -1,7 +1,8 @@
+import java.time.Duration;
 public class Service {
     private String name;
     private double price;
-    private int durationInMinutes;
+    private long durationInMinutes;
 
     public Service(String name, double price, int durationInMinutes) {
         this.name = name;
@@ -25,8 +26,8 @@ public class Service {
         this.price = price;
     }
 
-    public int getDurationInMinutes() {
-        return durationInMinutes;
+    public Duration getDurationInMinutes() {
+        return Duration.ofMinutes(durationInMinutes);
     }
 
     public void setDurationInMinutes(int durationInMinutes) {

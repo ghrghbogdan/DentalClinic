@@ -25,6 +25,13 @@ public class Bill {
         return issueDate;
     }
 
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+    public void setIssueDate(LocalDate issueDate) {
+        this.issueDate = issueDate;
+    }
+
     public boolean isPaid() {
         return paid;
     }
@@ -38,7 +45,6 @@ public class Bill {
         return "Bill for " + appointment.getPatient().getName() +
                 "\nService: " + appointment.getService().getName() +
                 "\nAmount: $" + totalAmount +
-                "\nDate: " + issueDate +
-                "\nStatus: " + (paid ? "PAID" : "UNPAID");
+                "\nDate: " + issueDate ;
     }
 }
