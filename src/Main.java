@@ -75,8 +75,14 @@ public class Main {
         System.out.print("Enter name: ");
         String name = scanner.nextLine();
 
+
         switch (option) {
-            case 1 -> clinicService.showAppointmentsByDoctor(name);
+            case 1 ->{
+                        System.out.print("Enter date and time (yyyy-MM-dd): ");
+                        String dateString = scanner.nextLine();
+                        LocalDate date = LocalDate.parse(dateString);
+                        clinicService.showAppointmentsByDoctor(name,date);
+                        }
             case 2 -> clinicService.showAppointmentsByClinic(name);
             case 3 -> clinicService.showAppointmentsByPatient(name);
             default -> System.out.println("Invalid option.");

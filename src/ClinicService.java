@@ -48,7 +48,7 @@ public class ClinicService {
             for (Clinic clinic : dbClinics) {
                 if (network.findClinicByName(clinic.getName()) == null) {
                     network.addClinic(clinic);
-                    System.out.println("Loaded clinic: " + clinic.getName());
+
                 }
             }
 
@@ -59,7 +59,6 @@ public class ClinicService {
                     Clinic clinic = network.findClinicByName(doctor.getClinic().getName());
                     if (clinic != null && !clinic.getDoctors().contains(doctor)) {
                         clinic.addDoctor(doctor);
-                        System.out.println("Loaded doctor: " + doctor.getName() + " in clinic: " + clinic.getName());
                     }
                 }
             }
@@ -71,7 +70,7 @@ public class ClinicService {
                 // For now, we'll add them to the first clinic as a simplification
                 if (!network.getClinics().isEmpty() && !network.getClinics().get(0).getPatients().contains(patient)) {
                     network.getClinics().get(0).addPatient(patient);
-                    System.out.println("Loaded patient: " + patient.getName() + " in clinic: " + network.getClinics().get(0).getName());
+
                 }
             }
 
@@ -83,8 +82,7 @@ public class ClinicService {
 
             for (Appointment appointment : dbAppointments) {
                 this.appointments.add(appointment);
-                System.out.println("Loaded appointment: " + appointment.getDateTime() + " for patient: " + appointment.getPatient().getName());
-            }
+           }
 
 
             // Load bills by patient
@@ -92,7 +90,7 @@ public class ClinicService {
             for (Bill bill : allBills) {
                 String patientName = bill.getAppointment().getPatient().getName();
                 billsByPatient.computeIfAbsent(patientName, k -> new ArrayList<>()).add(bill);
-                System.out.println("Loaded bill for patient: " + patientName );
+
             }
 
             // Load services for each clinic
@@ -102,8 +100,7 @@ public class ClinicService {
                     for (Service service : clinicServices) {
                         if (!clinic.getServices().contains(service)) {
                             clinic.addService(service);
-                            System.out.println("Loaded service: " + service.getName() + " in clinic: " + clinic.getName());
-                        }
+                       }
                     }
                 } catch (SQLException e) {
                     System.err.println("Error loading services for clinic: " + clinic.getName());
@@ -249,7 +246,6 @@ public class ClinicService {
 
         long duration = service.getDurationInMinutes().toMinutes();
 
-        // Get all appointments for this doctor on the requested day
         List<Appointment> doctorAppointments = appointments.stream()
                 .filter(a -> a.getDoctor().getName().equalsIgnoreCase(doctorName))
                 .filter(a -> a.getDateTime().toLocalDate().equals(requestedTime.toLocalDate()))
@@ -394,7 +390,7 @@ public class ClinicService {
         System.out.println("===================");
     }
 
-    public void showAppointmentsByDoctor(String doctorName) {
+    public void showAppointmentsByDoctor(String doctorName, LocalDate date) {
         try {
             // Try to get doctor from database first
             List<Doctor> doctors = doctorService.readAll();
@@ -415,7 +411,9 @@ public class ClinicService {
                 }
 
                 doctorAppointments.sort(Comparator.comparing(Appointment::getDateTime));
-
+                doctorAppointments = doctorAppointments.stream()
+                        .filter(a -> a.getDateTime().toLocalDate().equals(date))
+                        .collect(Collectors.toList());
                 for (Appointment appointment : doctorAppointments) {
                     System.out.println(appointment.getDateTime() + " - " +
                             appointment.getPatient().getName() + " - " +
@@ -492,7 +490,6 @@ public class ClinicService {
 
     public void showMedicalHistory(String patientName) {
         try {
-            // Try to get patient from database first
             List<Patient> patients = patientService.readAll();
             Patient foundPatient = null;
             for (Patient p : patients) {
@@ -687,6 +684,7 @@ public class ClinicService {
     public void updateService(String clinicName, String serviceName, Double newPrice) {
         try {
             medicalService.updateServicePriceForClinic(serviceName, clinicName, newPrice);
+            auditService.logAction("Updated service price for: " + serviceName + " in clinic: " + clinicName + " to $" + newPrice);
         } catch (SQLException e) {
             System.err.println("Error updating service price: " + e.getMessage());
         }
